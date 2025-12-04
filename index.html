@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Страна Девелопмент</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+<body>
+
+<!-- Frame 1 - Главная страница -->
+<div id="screen1" class="screen active">
+    <div style="display: flex; flex-direction: column; align-items: flex-end; width: 280px; margin: 0 auto;">
+        <img src="assets/logo_2024_gradient.png" alt="Логотип" style="max-width: 280px;">
+        <div class="development-text" style="text-align: right; width: 100%; margin-top: -5px; font-size: 16px; font-weight: 450; color: #000000;">ДЕВЕЛОПМЕНТ</div>
+    </div>
+    <div class="main-heading">Выбирайте квартиру мечты с нами!</div>
+    <button class="btn" onclick="goToScreen('screen3')">Выбрать квартиру</button>
+</div>
+
+<!-- Frame 3 - Комплексы -->
+<div id="screen3" class="screen">
+    <h1>Комплексы</h1>
+    <div class="search-container">
+        <div class="search-icon">🔍</div>
+        <!-- Добавили id и oninput -->
+        <input id="searchInput" class="search-input" placeholder="Поиск" oninput="handleSearch()" style="border: 1px solid #8F1C81; border-radius: 8px;">
+    </div>
+    
+    <!-- Контейнер для динамических карточек -->
+    <div id="projects-container">
+        <!-- Карточки будут загружены сюда через JS -->
+    </div>
+</div>
+
+<!-- Frame 4 - Выбор дома -->
+<div id="screen4" class="screen">
+    <h1 id="screen4-project-title">ЖК</h1>
+    <!-- Контейнер для фото ЖК (как на 3 экране) -->
+    <div id="screen4-project-image-container"></div>
+    
+    <h2>Выбрать дом</h2>
+    
+    <!-- Сюда будут загружаться корпуса -->
+    <div id="buildings-container" class="grid">
+        <!-- Динамический контент -->
+    </div>
+
+    <button class="back-button" onclick="goToScreen('screen3')">
+        <span class="back-arrow">←</span> Назад к выбору комплекса
+    </button>
+</div>
+
+<!-- Frame 6 - Выбор квартиры -->
+<div id="screen6" class="screen">
+    <h1 id="screen6-title">Корпус</h1>
+    
+    <!-- Контейнер для фото корпуса -->
+    <div id="screen6-image-container">
+        <!-- Сюда JS вставит картинку или серый блок -->
+    </div>
+    
+    <h2>Выбрать квартиру</h2>
+    
+    <div class="card">
+        <h3>Этаж</h3>
+        <div class="card" style="background: rgba(143, 28, 129, 0.05); border: 1px solid #8F1C81; border-radius: 12px; padding: 0px 12px; margin: 8px 0;">
+            <div class="filter-row">
+                <span>с</span>
+                <!-- Добавлены ID floor-min-input и floor-max-input -->
+                <input id="floor-min-input" type="number" class="floor-input" style="border-radius: 6px;">
+                <span>по</span>
+                <input id="floor-max-input" type="number" class="floor-input" style="border-radius: 6px;">
+            </div>
+        </div>
+    
+        <h3>Комнаты</h3>
+        <div class="card" style="background: rgba(143, 28, 129, 0.05); border: 1px solid #8F1C81; border-radius: 12px; padding: 0px 12px; margin: 8px 0;">
+            <div class="room-controls">
+                <button class="room-btn" onclick="changeRoomCount(-1)" style="border-radius: 6px; border: none; background: transparent; color: #000000; font-size: 18px; font-weight: bold;">-</button>
+                <!-- Добавлен ID room-count -->
+                <span id="room-count" class="room-count">1</span>
+                <button class="room-btn" onclick="changeRoomCount(1)" style="border-radius: 6px; border: none; background: transparent; color: #000000; font-size: 18px; font-weight: bold;">+</button>
+            </div>
+        </div>
+        
+        <button class="btn" onclick="goToScreen('screen7')">Показать варианты</button>
+    </div>
+    
+    <button class="back-button" onclick="goToScreen('screen4')">
+        <span class="back-arrow">←</span> Назад к выбору корпуса
+    </button>
+</div>
+
+<!-- Frame 7 - Шахматка -->
+<div id="screen7" class="screen" style="padding-top: 40px;">
+    <!-- Заголовок корпуса -->
+    <h1 id="screen7-title" style="margin-bottom: 60px;">Корпус</h1>
+
+    <!-- Контейнер для этажей и квартир -->
+    <div id="chessboard-container">
+        <!-- Сюда JS загрузит этажи -->
+    </div>
+
+    <!-- Кнопка подтверждения выбора -->
+    <button class="btn" onclick="goToFlatDetails()" style="display:block; margin: 0 auto 30px auto;">Выбрать</button>
+    
+    <button class="back-button" onclick="goToScreen('screen6')">
+        <span class="back-arrow">←</span> Вернуться к параметрам
+    </button>
+</div>
+
+<!-- Frame 10 - Детали квартиры -->
+<div id="screen10" class="screen">
+    <!-- ID: flat-title -->
+    <h1 id="flat-title">Квартира</h1>
+    
+    <div class="card">
+        <!-- ID: flat-image-container -->
+        <div id="flat-image-container" class="gray-box">[Фото квартиры]</div>
+        <h2>Описание</h2>
+        
+        <div class="detail-item">
+            <span>Количество комнат:</span>
+            <!-- ID: flat-rooms -->
+            <span id="flat-rooms"></span>
+        </div>
+        <div class="detail-item">
+            <span>Этаж:</span>
+            <!-- ID: flat-floor -->
+            <span id="flat-floor"></span>
+        </div>
+        <div class="detail-item">
+            <span>Площадь:</span>
+            <!-- ID: flat-area -->
+            <span id="flat-area"></span>
+        </div>
+        <div class="detail-item">
+            <span>Ремонт/Тип:</span>
+            <!-- ID: flat-layout -->
+            <span id="flat-layout">—</span>
+        </div>
+        <button class="btn" onclick="goToScreen('screen8')">Забронировать</button>
+    </div>
+    <button class="back-button" onclick="goToScreen('screen7')">
+        <span class="back-arrow">←</span> Вернуться к просмотру квартир
+    </button>
+</div>
+
+<!-- Frame 8 - Бронирование -->
+<div id="screen8" class="screen">
+    <h1>Забронировать квартиру</h1>
+    
+    <div class="card">
+        <input id="fullName" placeholder="ФИО" oninput="validateForm()">
+        <input id="phone" placeholder="Контактный номер телефона" oninput="validateForm()">
+        <input id="email" placeholder="Электронная почта" oninput="validateForm()">
+        
+        <div class="agreement-container">
+            <div id="agreementCheckbox" class="agreement-checkbox" onclick="toggleAgreement()"></div>
+            <div class="agreement-text">
+                Я принимаю условия пользовательского соглашения и даю согласие на обработку персональных данных
+            </div>
+        </div>
+        <div id="errorMessage" class="error-message">Пожалуйста, заполните все поля правильно и примите условия соглашения</div>
+        
+        <!-- ИЗМЕНЕНИЕ ЗДЕСЬ: onclick="submitBooking()" -->
+        <button id="reserveBtn" class="btn" onclick="submitBooking()" disabled>Забронировать</button>
+    </div>
+    <button class="back-button" onclick="goToScreen('screen10')">
+        <span class="back-arrow">←</span> Вернуться назад
+    </button>
+</div>
+
+<!-- Frame 9 - Успешное бронирование -->
+<div id="screen9" class="screen">
+    <img src="assets/logo_2024_gradient.png" alt="Логотип" style="max-width: 280px; margin-bottom: 40px; margin-top: 20px; align-self: flex-end;">
+    <div class="card" style="text-align: center; padding: 32px 16px;">
+        <div class="success-icon">✓</div>
+        <h2 class="success-text">Ваша бронь успешно зафиксирована</h2>
+        <p>После обработки мы обязательно с Вами свяжемся</p>
+        <button class="btn" onclick="goToScreen('screen1')">Ок</button>
+    </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
