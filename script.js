@@ -675,5 +675,4 @@ function submitBooking() {
             reserveBtn.textContent = 'Забронировать';
         }
     });
-
 }
