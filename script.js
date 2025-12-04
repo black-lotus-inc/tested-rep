@@ -38,6 +38,14 @@ function goToScreen(screenId) {
             loadChessboard();
         } else if (screenId === 'screen10') {
             loadFlatDetails();
+        } 
+        // Если переходим на Главную (screen1) с экрана успеха -> чистим форму
+        else if (screenId === 'screen1') {
+            resetBookingForm();
+            // Сбрасываем выбранные проекты/квартиры, чтобы начать поиск заново
+            currentProject = null;
+            currentBuilding = null;
+            selectedFlatId = null;
         }
     }
 }
@@ -573,6 +581,25 @@ function getTelegramInitData() {
     return '';
 }
 
+// --- ФУНКЦИЯ ОЧИСТКИ ФОРМЫ ---
+function resetBookingForm() {
+    // Очистка текстовых полей
+    document.getElementById('fullName').value = '';
+    document.getElementById('phone').value = '';
+    document.getElementById('email').value = '';
+    
+    // Сброс галочки согласия
+    agreementChecked = false;
+    const checkbox = document.getElementById('agreementCheckbox');
+    if (checkbox) {
+        checkbox.classList.remove('checked');
+        checkbox.innerHTML = '';
+    }
+    
+    // Сброс состояния кнопки (через валидацию)
+    validateForm();
+}
+
 // Основная функция отправки брони
 function submitBooking() {
     if (!selectedFlatId) {
@@ -600,11 +627,15 @@ function submitBooking() {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'x-telegram-initdata': getTelegramInitData() // Заголовок с данными телеграма
+            'x-telegram-initdata': getTelegramInitData()
         },
         body: JSON.stringify(bookingData)
     })
     .then(response => {
+        // ОБРАБОТКА ОШИБКИ 409 (КОНФЛИКТ)
+        if (response.status === 409) {
+            throw new Error('CONFLICT');
+        }
         if (!response.ok) {
             throw new Error('Ошибка сервера при бронировании');
         }
@@ -612,10 +643,13 @@ function submitBooking() {
     })
     .then(data => {
         if (data.success) {
-            // Успех -> Переход на финальный экран
+            // УСПЕХ: Очищаем форму (галочки, поля)
+            resetBookingForm();
+            
+            // Переход на финальный экран
             goToScreen('screen9');
         } else {
-            // Ошибка от бэкенда (например, уже занято)
+            // Логическая ошибка от бэкенда
             alert(`Ошибка бронирования: ${data.message || 'Неизвестная ошибка'}`);
             reserveBtn.disabled = false;
             reserveBtn.textContent = 'Забронировать';
@@ -623,8 +657,22 @@ function submitBooking() {
     })
     .catch(error => {
         console.error('Ошибка:', error);
-        alert('Произошла ошибка при отправке данных. Попробуйте позже.');
-        reserveBtn.disabled = false;
-        reserveBtn.textContent = 'Забронировать';
+
+        // Обработка конфликта бронирования
+        if (error.message === 'CONFLICT') {
+            alert('К сожалению, эта квартира только что была забронирована другим пользователем. Пожалуйста, выберите другую.');
+            
+            // Сбрасываем выбранную квартиру
+            selectedFlatId = null;
+            currentFlat = null;
+            
+            // Перенаправляем на экран выбора комплексов (screen3)
+            goToScreen('screen3');
+        } else {
+            // Прочие ошибки
+            alert('Произошла ошибка при отправке данных. Попробуйте позже.');
+            reserveBtn.disabled = false;
+            reserveBtn.textContent = 'Забронировать';
+        }
     });
 }
