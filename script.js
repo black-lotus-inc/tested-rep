@@ -648,8 +648,6 @@ function submitBooking() {
             
             // Переход на финальный экран
             goToScreen('screen9');
-            reserveBtn.disabled = false;
-            reserveBtn.textContent = 'Забронировать';
         } else {
             // Логическая ошибка от бэкенда
             alert(`Ошибка бронирования: ${data.message || 'Неизвестная ошибка'}`);
@@ -663,6 +661,8 @@ function submitBooking() {
         // Обработка конфликта бронирования
         if (error.message === 'CONFLICT') {
             alert('К сожалению, эта квартира только что была забронирована другим пользователем. Пожалуйста, выберите другую.');
+            reserveBtn.disabled = false;
+            reserveBtn.textContent = 'Забронировать';
             
             // Сбрасываем выбранную квартиру
             selectedFlatId = null;
