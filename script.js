@@ -2,7 +2,7 @@
 // -- запуск сервера 
 // -- запуск бэкенда 
 // -- запуск profitbase api 
-const API_BASE_URL = 'https://b16a9cce0f3075.lhr.life/api/v1';
+const API_BASE_URL = 'https://a3a40f25209150.lhr.life/api/v1';
 
 // Глобальные переменные состояния
 let allProjects = []; 
